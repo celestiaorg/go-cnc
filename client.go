@@ -54,9 +54,25 @@ func (c *Client) Balance(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error {
-	_ = submitTxEndpoint
-	return errors.New("method SubmitTx not implemented")
+func (c *Client) SubmitTx(ctx context.Context, tx []byte) (*TxResponse, error) {
+	req := SubmitTxRequest{
+		Tx: string(tx),
+	}
+	var res TxResponse
+	var rpcErr string
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetBody(req).
+		SetResult(&res).
+		SetError(&rpcErr).
+		Post(submitTxEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	if rpcErr != "" {
+		return nil, errors.New(rpcErr)
+	}
+	return &res, nil
 }
 
 func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte, gasLimit uint64) (*TxResponse, error) {
