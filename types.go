@@ -9,7 +9,7 @@ type SubmitPFDRequest struct {
 	GasLimit    uint64 `json:"gas_limit"`
 }
 
-type balanceRequest struct {
+type balanceResponse struct {
 	Denom  string `json:"denom"`
 	Amount string `json:"amount"`
 }

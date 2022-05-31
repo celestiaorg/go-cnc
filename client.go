@@ -35,7 +35,7 @@ func (c *Client) Header(ctx context.Context, height uint64) /* Header */ error {
 }
 
 func (c *Client) Balance(ctx context.Context) error {
-	var result balanceRequest
+	var result balanceResponse
 	var rpcErr string
 
 	_, err := c.c.R().
