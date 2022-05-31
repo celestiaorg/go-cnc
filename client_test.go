@@ -53,3 +53,9 @@ func TestSubmitPDF(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, txRes)
 }
+
+func TestBalance(t *testing.T) {
+	//t.Skip()
+	_, err := NewClient("http://localhost:26658", WithTimeout(30*time.Second))
+	assert.NoError(t, err)
+}

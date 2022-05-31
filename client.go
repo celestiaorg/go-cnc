@@ -35,8 +35,23 @@ func (c *Client) Header(ctx context.Context, height uint64) /* Header */ error {
 }
 
 func (c *Client) Balance(ctx context.Context) error {
-	_ = balanceEndpoint
-	return errors.New("method Balance not implemented")
+	var result balanceRequest
+	var rpcErr string
+
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetError(&rpcErr).
+		Get(balanceEndpoint)
+	if err != nil {
+		return err
+	}
+
+	if rpcErr != "" {
+		return errors.New(rpcErr)
+	}
+
+	return nil
 }
 
 func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error {
