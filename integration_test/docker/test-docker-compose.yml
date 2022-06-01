@@ -4,47 +4,35 @@ services:
   core0:
     container_name: core0
     image: "ghcr.io/celestiaorg/celestia-app-ephemeral:latest"
-    environment:
-      - MY_VAL_ADDRESS=celes1z4t2fnem459xcfj5kknnd5yy8rp4frhdnnkel9
+    entrypoint: [
+      "/bin/bash"
+    ]
     command: [
-      "start",
-      "--moniker", "core0",
-      "--rpc.laddr", "tcp://0.0.0.0:26657"
+      "/start-celestia-appd.sh"
     ]
     volumes:
-      - ${PWD}/docker/celestia-app/config/priv_validator_key.json:/celestia-app/config/priv_validator_key.json:ro
-      - ${PWD}/docker/celestia-app/config/node_key.json:/celestia-app/config/node_key.json:ro
-      - ${PWD}/docker/celestia-app/keyring-test:/celestia-app/keyring-test:ro
-      - ${PWD}/docker/celestia-app/genesis.json:/celestia-app/config/genesis.json:ro
-      - ${PWD}/docker/celestia-app/config.toml:/celestia-app/config/config.toml:ro
+      - ${PWD}/docker/start-celestia-appd.sh:/start-celestia-appd.sh:ro
+      - ${PWD}/docker/fix-genesis.sh:/fix-genesis.sh:ro
+      - keyring-volume:/celestia-app/node/keyring-test
     networks:
       localnet:
-        ipv4_address: 192.167.10.0
-
+        ipv4_address: 192.167.10.10
 
   bridge0:
     container_name: bridge0
     depends_on:
       - core0
     image: "ghcr.io/celestiaorg/celestia-node:sha-25652db"
-    environment:
-      - NODE_TYPE=bridge
-      - MY_VAL_ADDRESS=celes1dm7fp7uwrr5y68v48gg8jhd2cku7vt7f4l8w0s
-      - CELESTIA_CUSTOM=ephemeral:02EED4BCFAF0CC8A3D1100D588E571FBF44219488F01AB48870BC9015A9F105A
+    entrypoint: [
+      "/bin/bash"
+    ]
     command: [
-            "/wait-for-it.sh", "192.167.10.0:26657/header", "--",
-            "./celestia", "bridge",
-            "--node.store", "/bridge",
-            "--rpc.port", "26658",
-            "--core.grpc", "192.167.10.0:9090", 
-            "--core.remote", "tcp://192.167.10.0:26657",
-            "start",
-             ]
+      "/start-bridge.sh"
+    ]
     volumes:
-       - ${PWD}/docker/wait-for-it.sh:/wait-for-it.sh:ro
-       - ${PWD}/docker/celestia-bridge/data/LOCK:/bridge/data/LOCK
-       - ${PWD}/docker/celestia-bridge/config.toml:/bridge/config.toml
-       - ${PWD}/docker/celestia-app/keyring-test/:/bridge/keys/keyring-test/:ro
+      - ${PWD}/docker/wait-for-it.sh:/wait-for-it.sh:ro
+      - ${PWD}/docker/start-bridge.sh:/start-bridge.sh:ro
+      - keyring-volume:/bridge/keys/keyring-test/:ro
 
     expose:
       - "26658/tcp"
@@ -54,7 +42,10 @@ services:
 
     networks:
       localnet:
-        ipv4_address: 192.167.3.0
+        ipv4_address: 192.167.10.20
+
+volumes:
+  keyring-volume:
 
 networks:
   localnet:
@@ -62,4 +53,4 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 192.167.10.0/16
+        - subnet: 192.167.10.0/24
