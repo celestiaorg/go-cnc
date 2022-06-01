@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -29,19 +30,61 @@ func NewClient(baseURL string, options ...Option) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) Header(ctx context.Context, height uint64) /* Header */ error {
-	_ = headerPath()
-	return errors.New("method Header not implemented")
+func (c *Client) Header(ctx context.Context, height uint64) (*Header, error) {
+	var result Header
+	var rpcErr string
+	var heightKey = strconv.FormatUint(height, 10)
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetError(&rpcErr).
+		Get(headerPath(heightKey))
+	if err != nil {
+		return nil, err
+	}
+	if rpcErr != "" {
+		return nil, errors.New(rpcErr)
+	}
+	return &result, nil
 }
 
 func (c *Client) Balance(ctx context.Context) error {
-	_ = balanceEndpoint
-	return errors.New("method Balance not implemented")
+	var result BalanceResponse
+	var rpcErr string
+
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetError(&rpcErr).
+		Get(balanceEndpoint)
+	if err != nil {
+		return err
+	}
+	if rpcErr != "" {
+		return errors.New(rpcErr)
+	}
+	return nil
 }
 
-func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error {
-	_ = submitTxEndpoint
-	return errors.New("method SubmitTx not implemented")
+func (c *Client) SubmitTx(ctx context.Context, tx []byte) (*TxResponse, error) {
+	req := SubmitTxRequest{
+		Tx: string(tx),
+	}
+	var res TxResponse
+	var rpcErr string
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetBody(req).
+		SetResult(&res).
+		SetError(&rpcErr).
+		Post(submitTxEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	if rpcErr != "" {
+		return nil, errors.New(rpcErr)
+	}
+	return &res, nil
 }
 
 func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte, gasLimit uint64) (*TxResponse, error) {
@@ -112,8 +155,8 @@ func (c *Client) callNamespacedEndpoint(ctx context.Context, namespaceID [8]byte
 	return nil
 }
 
-func headerPath() string {
-	return fmt.Sprintf("%s/%s", headerEndpoint, heightKey)
+func headerPath(height string) string {
+	return fmt.Sprintf("%s/%s", headerEndpoint, height)
 }
 
 func namespacedPath(endpoint string, namespaceID [8]byte, height uint64) string {
