@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -29,13 +30,26 @@ func NewClient(baseURL string, options ...Option) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) Header(ctx context.Context, height uint64) /* Header */ error {
-	_ = headerPath()
-	return errors.New("method Header not implemented")
+func (c *Client) Header(ctx context.Context, height uint64) (*Header, error) {
+	var result Header
+	var rpcErr string
+	var heightKey = strconv.FormatUint(height, 10)
+	_, err := c.c.R().
+		SetContext(ctx).
+		SetResult(&result).
+		SetError(&rpcErr).
+		Get(headerPath(heightKey))
+	if err != nil {
+		return nil, err
+	}
+	if rpcErr != "" {
+		return nil, errors.New(rpcErr)
+	}
+	return &result, nil
 }
 
 func (c *Client) Balance(ctx context.Context) error {
-	var result balanceResponse
+	var result BalanceResponse
 	var rpcErr string
 
 	_, err := c.c.R().
@@ -46,11 +60,9 @@ func (c *Client) Balance(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
 	if rpcErr != "" {
 		return errors.New(rpcErr)
 	}
-
 	return nil
 }
 
@@ -143,8 +155,8 @@ func (c *Client) callNamespacedEndpoint(ctx context.Context, namespaceID [8]byte
 	return nil
 }
 
-func headerPath() string {
-	return fmt.Sprintf("%s/%s", headerEndpoint, heightKey)
+func headerPath(height string) string {
+	return fmt.Sprintf("%s/%s", headerEndpoint, height)
 }
 
 func namespacedPath(endpoint string, namespaceID [8]byte, height uint64) string {

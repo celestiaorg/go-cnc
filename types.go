@@ -9,13 +9,20 @@ type SubmitPFDRequest struct {
 	GasLimit    uint64 `json:"gas_limit"`
 }
 
-type balanceResponse struct {
+type BalanceResponse struct {
 	Denom  string `json:"denom"`
 	Amount string `json:"amount"`
 }
 
 type SubmitTxRequest struct {
 	Tx string `json:"tx"`
+}
+
+type Header struct {
+	Header       string `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
+	Commit       string `protobuf:"bytes,2,opt,name=commit,proto3" json:"commit,omitempty"`
+	ValidatorSet string `protobuf:"bytes,3,opt,name=validator_set,json=validatorSet,proto3" json:"validator_set,omitempty"`
+	Dah          string `protobuf:"bytes,4,opt,name=dah,proto3" json:"dah,omitempty"`
 }
 
 // Types below are copied from celestia-node (or cosmos-sdk dependency of celestia node, to be precise)

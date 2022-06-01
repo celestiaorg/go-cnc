@@ -68,3 +68,8 @@ func TestSubmitTx(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, txRes)
 }
+
+func TestHeader(t *testing.T) {
+	_, err := NewClient("http://localhost:26658", WithTimeout(5*time.Second))
+	assert.NoError(t, err)
+}
