@@ -76,3 +76,7 @@ type Attribute struct {
 	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
+
+type JSONError struct {
+	Err string `json:"error"`
+}

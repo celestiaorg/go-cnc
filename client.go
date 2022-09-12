@@ -51,7 +51,7 @@ func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte
 		GasLimit:    gasLimit,
 	}
 	var res TxResponse
-	var rpcErr string
+	var rpcErr JSONError
 	_, err := c.c.R().
 		SetContext(ctx).
 		SetBody(req).
@@ -61,8 +61,8 @@ func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte
 	if err != nil {
 		return nil, err
 	}
-	if rpcErr != "" {
-		return nil, errors.New(rpcErr)
+	if rpcErr.Err != "" {
+		return nil, errors.New(rpcErr.Err)
 	}
 	return &res, nil
 }
@@ -97,7 +97,7 @@ func (c *Client) NamespacedData(ctx context.Context, namespaceID [8]byte, height
 
 // callNamespacedEndpoint fetches result of /namespaced_{type} family of endpoints into result (this should be pointer!)
 func (c *Client) callNamespacedEndpoint(ctx context.Context, namespaceID [8]byte, height uint64, endpoint string, result interface{}) error {
-	var rpcErr string
+	var rpcErr JSONError
 	_, err := c.c.R().
 		SetContext(ctx).
 		SetResult(result).
@@ -106,8 +106,8 @@ func (c *Client) callNamespacedEndpoint(ctx context.Context, namespaceID [8]byte
 	if err != nil {
 		return err
 	}
-	if rpcErr != "" {
-		return errors.New(rpcErr)
+	if rpcErr.Err != "" {
+		return errors.New(rpcErr.Err)
 	}
 	return nil
 }
