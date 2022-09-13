@@ -3,7 +3,7 @@ version: '3'
 services:
   core0:
     container_name: core0
-    image: "ghcr.io/celestiaorg/celestia-app-ephemeral:latest"
+    image: "ghcr.io/celestiaorg/celestia-app@sha256:9166143fe2a6502a2e9edad84db4973ae1a06f044faa5dee9d20190f33906671"
     entrypoint: [
       "/bin/bash"
     ]
