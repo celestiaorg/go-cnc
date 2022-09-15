@@ -2,6 +2,8 @@ package cnc_test
 
 import (
 	"context"
+	"fmt"
+	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -71,7 +73,7 @@ func (i *IntegrationTestSuite) TestNewClient() {
 }
 
 func (i *IntegrationTestSuite) TestDataRoundTrip() {
-	client, err := cnc.NewClient("http://localhost:26658", cnc.WithTimeout(30*time.Second))
+	client, err := cnc.NewClient("http://localhost:26658", cnc.WithTimeout(60*time.Second))
 	i.NoError(err)
 	i.NotNil(client)
 
@@ -81,6 +83,18 @@ func (i *IntegrationTestSuite) TestDataRoundTrip() {
 	i.Require().NotNil(txRes)
 	i.Assert().Zero(txRes.Code)
 	expectedHeight := txRes.Height
+
+	{
+		cmd := exec.Command("docker", "logs", "core0")
+		out, err := cmd.CombinedOutput()
+		fmt.Println("tzdybal:", string(out), err)
+	}
+
+	{
+		cmd := exec.Command("docker", "logs", "bridge0")
+		out, err := cmd.CombinedOutput()
+		fmt.Println("tzdybal:", string(out), err)
+	}
 
 	data, err := client.NamespacedData(context.TODO(), [8]byte{1, 2, 3, 4, 5, 6, 7, 8}, uint64(expectedHeight))
 	i.Require().NoError(err)
