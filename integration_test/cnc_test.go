@@ -32,14 +32,14 @@ func (i *IntegrationTestSuite) SetupSuite() {
 	execError := i.dockerCompose.WithCommand([]string{"up", "-d"}).Invoke()
 	err := execError.Error
 	if err != nil {
-		i.Fail("failed to execute docker compose up:", "err", err.Error(), "stdout", execError.Stdout, "stderr", execError.Stderr)
+		i.Fail("failed to execute docker compose up", "error: %s\nstdout: %v\nstderr: %v\n", err.Error(), execError.Stdout, execError.Stderr)
 	}
 }
 
 func (i *IntegrationTestSuite) TearDownSuite() {
 	execError := i.dockerCompose.Down()
 	if err := execError.Error; err != nil {
-		i.Fail("failed to execute docker compose down: %v\n", err, execError.Stdout, execError.Stderr)
+		i.Fail("failed to execute docker compose down", "error: %s\nstdout: %v\nstderr: %v\n", err.Error(), execError.Stdout, execError.Stderr)
 	}
 }
 
