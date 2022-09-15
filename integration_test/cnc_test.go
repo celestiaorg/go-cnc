@@ -27,7 +27,7 @@ func (i *IntegrationTestSuite) SetupSuite() {
 	i.dockerCompose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
 	i.dockerCompose.WaitForService("bridge0",
 		wait.ForHTTP("/balance").WithPort("26658").
-			WithStartupTimeout(60*time.Second).
+			WithStartupTimeout(90*time.Second).
 			WithPollInterval(3*time.Second))
 	execError := i.dockerCompose.WithCommand([]string{"up", "-d"}).Invoke()
 	err := execError.Error
