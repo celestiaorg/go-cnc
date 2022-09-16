@@ -7,6 +7,8 @@ apt-get install -y curl jq
 /wait-for-it.sh -t 90 192.167.10.10:26657/header -- \
   curl -s http://192.167.10.10:26657/block?height=1 | jq '.result.block_id.hash' | tr -d '"' > genesis.hash
 
+curl -s http://192.167.10.10:26657/block_by_hash?hash=0x`cat genesis.hash`
+
 export CELESTIA_CUSTOM=ephemeral:`cat genesis.hash`
 echo $CELESTIA_CUSTOM
 ./celestia bridge --node.store /bridge --rpc.port 26658 \
