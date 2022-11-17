@@ -3,7 +3,7 @@ version: '3'
 services:
   core0:
     container_name: core0
-    image: "ghcr.io/celestiaorg/celestia-app-ephemeral:latest"
+    image: "ghcr.io/celestiaorg/celestia-app:v0.10.0-rc1"
     entrypoint: [
       "/bin/bash"
     ]
@@ -12,8 +12,7 @@ services:
     ]
     volumes:
       - ${PWD}/docker/start-celestia-appd.sh:/start-celestia-appd.sh:ro
-      - ${PWD}/docker/fix-genesis.sh:/fix-genesis.sh:ro
-      - keyring-volume:/celestia-app/node/keyring-test
+      - keyring-volume:/root/.celestia-app/keyring-test
     networks:
       localnet:
         ipv4_address: 192.167.10.10
@@ -22,7 +21,7 @@ services:
     container_name: bridge0
     depends_on:
       - core0
-    image: "ghcr.io/celestiaorg/celestia-node:sha-25652db"
+    image: "ghcr.io/celestiaorg/celestia-node:0.5.0-rc5"
     entrypoint: [
       "/bin/bash"
     ]
@@ -35,10 +34,10 @@ services:
       - keyring-volume:/bridge/keys/keyring-test/:ro
 
     expose:
-      - "26658/tcp"
+      - "26659/tcp"
 
     ports:
-      - "26658:26658"
+      - "26659:26659"
 
     networks:
       localnet:
