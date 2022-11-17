@@ -26,7 +26,7 @@ func (i *IntegrationTestSuite) SetupSuite() {
 
 	i.dockerCompose = testcontainers.NewLocalDockerCompose(composeFilePaths, identifier)
 	i.dockerCompose.WaitForService("bridge0",
-		wait.ForHTTP("/balance").WithPort("26658").
+		wait.ForHTTP("/balance").WithPort("26659").
 			WithStartupTimeout(60*time.Second).
 			WithPollInterval(3*time.Second))
 	execError := i.dockerCompose.WithCommand([]string{"up", "-d"}).Invoke()
@@ -71,7 +71,7 @@ func (i *IntegrationTestSuite) TestNewClient() {
 }
 
 func (i *IntegrationTestSuite) TestDataRoundTrip() {
-	client, err := cnc.NewClient("http://localhost:26658", cnc.WithTimeout(30*time.Second))
+	client, err := cnc.NewClient("http://localhost:26659", cnc.WithTimeout(30*time.Second))
 	i.NoError(err)
 	i.NotNil(client)
 
