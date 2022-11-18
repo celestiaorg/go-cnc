@@ -3,14 +3,16 @@
 apt-get update
 apt-get install -y curl jq
 
-./celestia bridge --node.store /bridge init
-/wait-for-it.sh -t 30 192.167.10.10:26657/header -- \
+./celestia bridge init --node.store /bridge
+/wait-for-it.sh 192.167.10.10:26657 -t 90 -- \
   curl -s http://192.167.10.10:26657/block?height=1 | jq '.result.block_id.hash' | tr -d '"' > genesis.hash
 
-export CELESTIA_CUSTOM=ephemeral:`cat genesis.hash`
+curl -s http://192.167.10.10:26657/block_by_hash?hash=0x`cat genesis.hash`
+echo  # newline
+
+export CELESTIA_CUSTOM=test:`cat genesis.hash`
 echo $CELESTIA_CUSTOM
-./celestia bridge --node.store /bridge --rpc.port 26658 \
-  --core.grpc 192.167.10.10:9090 \
-  --core.remote tcp://192.167.10.10:26657 \
-  --keyring.accname node \
-  start
+./celestia bridge start \
+  --node.store /bridge --gateway \
+  --core.ip 192.167.10.10 \
+  --keyring.accname validator

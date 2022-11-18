@@ -1,25 +1,31 @@
 #!/usr/bin/env bash
 
-chain_id=ephemeral
-token=celestia
-node_name=node
-key_type=test
-celestia_appd=/celestia-app/celestia-appd
+CHAINID="test"
 
-rm -rf $node_name/config/genesis.json $node_name/config/gentx
-pwd
-$celestia_appd --home $node_name init $node_name --chain-id $chain_id
-$celestia_appd --home $node_name keys add $node_name --keyring-backend $key_type
-addr=`$celestia_appd --home $node_name keys show $node_name --address --keyring-backend test`
-echo $addr
-$celestia_appd --home $node_name add-genesis-account $addr 800000000000$token
+rm -rf /root/.celestia-app
 
-apk add moreutils # required for sponge
-/fix-genesis.sh $node_name/config/genesis.json $token
+# Build genesis file incl account for passed address
+coins="1000000000000000utia"
+celestia-appd init $CHAINID --chain-id $CHAINID 
+celestia-appd keys add validator --keyring-backend="test"
+# this won't work because the some proto types are decalared twice and the logs output to stdout (dependency hell involving iavl)
+celestia-appd add-genesis-account $(celestia-appd keys show validator -a --keyring-backend="test") $coins
+celestia-appd gentx validator 5000000000utia \
+  --keyring-backend="test" \
+  --chain-id $CHAINID \
+  --orchestrator-address $(celestia-appd keys show validator -a --keyring-backend="test") \
+  --evm-address 0x966e6f22781EF6a6A82BBB4DB3df8E225DfD9488 # private key: da6ed55cb2894ac2c9c10209c09de8e8b9d109b910338d5bf3d747a7e1fc9eb9
 
+celestia-appd collect-gentxs
 
-$celestia_appd --home $node_name gentx $node_name 5000000000$token --keyring-backend=$key_type --chain-id $chain_id
-$celestia_appd --home $node_name collect-gentxs
+# Set proper defaults and change ports
+# If you encounter: `sed: -I or -i may not be used with stdin` on MacOS you can mitigate by installing gnu-sed
+# https://gist.github.com/andre3k1/e3a1a7133fded5de5a9ee99c87c6fa0d?permalink_comment_id=3082272#gistcomment-3082272
+sed -i'.bak' 's#"tcp://127.0.0.1:26657"#"tcp://0.0.0.0:26657"#g' ~/.celestia-app/config/config.toml
+sed -i'.bak' 's/timeout_commit = "25s"/timeout_commit = "1s"/g' ~/.celestia-app/config/config.toml
+sed -i'.bak' 's/timeout_propose = "3s"/timeout_propose = "1s"/g' ~/.celestia-app/config/config.toml
+sed -i'.bak' 's/index_all_keys = false/index_all_keys = true/g' ~/.celestia-app/config/config.toml
+sed -i'.bak' 's/mode = "full"/mode = "validator"/g' ~/.celestia-app/config/config.toml
 
-sed -i $node_name/config/config.toml -e 's/"full"/"validator"/'
-$celestia_appd --home $node_name --rpc.laddr tcp://0.0.0.0:26657 start
+# Start the celestia-app
+celestia-appd start
