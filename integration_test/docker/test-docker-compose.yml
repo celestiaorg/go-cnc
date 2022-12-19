@@ -3,7 +3,7 @@ version: '3'
 services:
   core0:
     container_name: core0
-    image: "ghcr.io/celestiaorg/celestia-app:v0.10.0-rc1"
+    image: "ghcr.io/celestiaorg/celestia-app:v0.11.0"
     entrypoint: [
       "/bin/bash"
     ]
@@ -21,7 +21,7 @@ services:
     container_name: bridge0
     depends_on:
       - core0
-    image: "ghcr.io/celestiaorg/celestia-node:0.5.0-rc5"
+    image: "ghcr.io/celestiaorg/celestia-node:0.6.1"
     entrypoint: [
       "/bin/bash"
     ]
