@@ -1,11 +1,14 @@
 package cnc
 
-import "github.com/gogo/protobuf/types"
+import (
+	"github.com/gogo/protobuf/types"
+)
 
 // SubmitPFDRequest represents a request to submit a PayForData transaction.
 type SubmitPFDRequest struct {
 	NamespaceID string `json:"namespace_id"`
 	Data        string `json:"data"`
+	Fee         int64  `json:"fee"`
 	GasLimit    uint64 `json:"gas_limit"`
 }
 
