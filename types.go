@@ -4,8 +4,8 @@ import (
 	"github.com/gogo/protobuf/types"
 )
 
-// SubmitPFDRequest represents a request to submit a PayForData transaction.
-type SubmitPFDRequest struct {
+// SubmitPFBRequest represents a request to submit a PayForBlob transaction.
+type SubmitPFBRequest struct {
 	NamespaceID string `json:"namespace_id"`
 	Data        string `json:"data"`
 	Fee         int64  `json:"fee"`
