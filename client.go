@@ -44,8 +44,8 @@ func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error
 	return errors.New("method SubmitTx not implemented")
 }
 
-func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte, fee int64, gasLimit uint64) (*TxResponse, error) {
-	req := SubmitPFDRequest{
+func (c *Client) SubmitPFB(ctx context.Context, namespaceID [8]byte, data []byte, fee int64, gasLimit uint64) (*TxResponse, error) {
+	req := SubmitPFBRequest{
 		NamespaceID: hex.EncodeToString(namespaceID[:]),
 		Data:        hex.EncodeToString(data),
 		Fee:         fee,
@@ -58,7 +58,7 @@ func (c *Client) SubmitPFD(ctx context.Context, namespaceID [8]byte, data []byte
 		SetBody(req).
 		SetResult(&res).
 		SetError(&rpcErr).
-		Post(submitPFDEndpoint)
+		Post(submitPFBEndpoint)
 	if err != nil {
 		return nil, err
 	}

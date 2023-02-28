@@ -4,7 +4,7 @@ const (
 	headerEndpoint           = "/header"
 	balanceEndpoint          = "/balance"
 	submitTxEndpoint         = "/submit_tx"
-	submitPFDEndpoint        = "/submit_pfd"
+	submitPFBEndpoint        = "/submit_pfb"
 	namespacedSharesEndpoint = "/namespaced_shares"
 	namespacedDataEndpoint   = "/namespaced_data"
 

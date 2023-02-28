@@ -76,7 +76,7 @@ func (i *IntegrationTestSuite) TestDataRoundTrip() {
 	i.NotNil(client)
 
 	randomData := []byte("random data")
-	txRes, err := client.SubmitPFD(context.TODO(), [8]byte{1, 2, 3, 4, 5, 6, 7, 8}, randomData, 10000, 100000)
+	txRes, err := client.SubmitPFB(context.TODO(), [8]byte{1, 2, 3, 4, 5, 6, 7, 8}, randomData, 10000, 100000)
 	i.Require().NoError(err)
 	i.Require().NotNil(txRes)
 	i.Assert().Zero(txRes.Code)
