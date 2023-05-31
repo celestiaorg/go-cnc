@@ -4,9 +4,6 @@ import (
 	"github.com/gogo/protobuf/types"
 )
 
-// NamespaceID defines the type of the namespace ID
-type NamespaceID [28]byte
-
 // SubmitPFBRequest represents a request to submit a PayForBlob transaction.
 type SubmitPFBRequest struct {
 	NamespaceID string `json:"namespace_id"`

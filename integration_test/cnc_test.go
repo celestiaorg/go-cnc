@@ -1,6 +1,7 @@
 package cnc_test
 
 import (
+	"bytes"
 	"context"
 	"strings"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
+	appns "github.com/celestiaorg/celestia-app/pkg/namespace"
 	"github.com/celestiaorg/go-cnc"
 )
 
@@ -76,14 +78,19 @@ func (i *IntegrationTestSuite) TestDataRoundTrip() {
 	i.NotNil(client)
 
 	randomData := []byte("random data")
-	txRes, err := client.SubmitPFB(context.TODO(), cnc.NamespaceID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, randomData, 10000, 100000)
+	ns1 := appns.MustNewV0(bytes.Repeat([]byte{1}, appns.NamespaceVersionZeroIDSize))
+	txRes, err := client.SubmitPFB(context.TODO(), ns1, randomData, 10000, 100000)
 	i.Require().NoError(err)
 	i.Require().NotNil(txRes)
 	i.Assert().Zero(txRes.Code)
 	expectedHeight := txRes.Height
 
+	// FIXME: this is required to skip the following error
+	// current head local chain head: 3 is lower than requested height: 4 give
+	// header sync some time and retry later
 	time.Sleep(5 * time.Second)
-	data, err := client.NamespacedData(context.TODO(), cnc.NamespaceID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, uint64(expectedHeight))
+
+	data, err := client.NamespacedData(context.TODO(), ns1, uint64(expectedHeight))
 	i.Require().NoError(err)
 	i.Require().NotNil(data)
 	i.Len(data, 1)
