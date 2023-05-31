@@ -3,7 +3,7 @@ version: '3'
 services:
   core0:
     container_name: core0
-    image: "ghcr.io/celestiaorg/celestia-app:0.13.3"
+    image: "ghcr.io/celestiaorg/celestia-app:v1.0.0-rc1"
     entrypoint: [
       "/bin/bash"
     ]
@@ -32,7 +32,7 @@ services:
     volumes:
       - ${PWD}/docker/wait-for-it.sh:/wait-for-it.sh:ro
       - ${PWD}/docker/start-bridge.sh:/start-bridge.sh:ro
-      - keyring-volume:/bridge/keys/keyring-test/:ro
+      - keyring-volume:/bridge/keys/keyring-test/:rw
 
     expose:
       - "26659/tcp"
