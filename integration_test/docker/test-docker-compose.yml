@@ -22,6 +22,7 @@ services:
     depends_on:
       - core0
     image: "ghcr.io/celestiaorg/celestia-node:v0.10.2"
+    user: root
     entrypoint: [
       "/bin/bash"
     ]
