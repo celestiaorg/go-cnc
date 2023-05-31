@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	appns "github.com/celestiaorg/celestia-app/pkg/namespace"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -44,9 +45,10 @@ func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error
 	return errors.New("method SubmitTx not implemented")
 }
 
-func (c *Client) SubmitPFB(ctx context.Context, namespaceID [8]byte, data []byte, fee int64, gasLimit uint64) (*TxResponse, error) {
+func (c *Client) SubmitPFB(ctx context.Context, namespace appns.Namespace, data []byte, fee int64, gasLimit uint64) (*TxResponse, error) {
 	req := SubmitPFBRequest{
-		NamespaceID: hex.EncodeToString(namespaceID[:]),
+		// FIXME: See https://github.com/celestiaorg/celestia-node/issues/2292
+		NamespaceID: hex.EncodeToString(namespace.Bytes()[1:]),
 		Data:        hex.EncodeToString(data),
 		Fee:         fee,
 		GasLimit:    gasLimit,
@@ -68,13 +70,13 @@ func (c *Client) SubmitPFB(ctx context.Context, namespaceID [8]byte, data []byte
 	return &res, nil
 }
 
-func (c *Client) NamespacedShares(ctx context.Context, namespaceID [8]byte, height uint64) ([][]byte, error) {
+func (c *Client) NamespacedShares(ctx context.Context, namespace appns.Namespace, height uint64) ([][]byte, error) {
 	var res struct {
 		Shares [][]byte `json:"shares"`
 		Height uint64   `json:"height"`
 	}
 
-	err := c.callNamespacedEndpoint(ctx, namespaceID, height, namespacedSharesEndpoint, &res)
+	err := c.callNamespacedEndpoint(ctx, namespace, height, namespacedSharesEndpoint, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -82,13 +84,13 @@ func (c *Client) NamespacedShares(ctx context.Context, namespaceID [8]byte, heig
 	return res.Shares, nil
 }
 
-func (c *Client) NamespacedData(ctx context.Context, namespaceID [8]byte, height uint64) ([][]byte, error) {
+func (c *Client) NamespacedData(ctx context.Context, namespace appns.Namespace, height uint64) ([][]byte, error) {
 	var res struct {
 		Data   [][]byte `json:"data"`
 		Height uint64   `json:"height"`
 	}
 
-	err := c.callNamespacedEndpoint(ctx, namespaceID, height, namespacedDataEndpoint, &res)
+	err := c.callNamespacedEndpoint(ctx, namespace, height, namespacedDataEndpoint, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +99,13 @@ func (c *Client) NamespacedData(ctx context.Context, namespaceID [8]byte, height
 }
 
 // callNamespacedEndpoint fetches result of /namespaced_{type} family of endpoints into result (this should be pointer!)
-func (c *Client) callNamespacedEndpoint(ctx context.Context, namespaceID [8]byte, height uint64, endpoint string, result interface{}) error {
+func (c *Client) callNamespacedEndpoint(ctx context.Context, namespace appns.Namespace, height uint64, endpoint string, result interface{}) error {
 	var rpcErr string
 	_, err := c.c.R().
 		SetContext(ctx).
 		SetResult(result).
 		SetError(&rpcErr).
-		Get(namespacedPath(endpoint, namespaceID, height))
+		Get(namespacedPath(endpoint, namespace, height))
 	if err != nil {
 		return err
 	}
@@ -117,6 +119,6 @@ func headerPath() string {
 	return fmt.Sprintf("%s/%s", headerEndpoint, heightKey)
 }
 
-func namespacedPath(endpoint string, namespaceID [8]byte, height uint64) string {
-	return fmt.Sprintf("%s/%s/height/%d", endpoint, hex.EncodeToString(namespaceID[:]), height)
+func namespacedPath(endpoint string, namespace appns.Namespace, height uint64) string {
+	return fmt.Sprintf("%s/%s/height/%d", endpoint, hex.EncodeToString(namespace.Bytes()), height)
 }
