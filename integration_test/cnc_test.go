@@ -76,13 +76,14 @@ func (i *IntegrationTestSuite) TestDataRoundTrip() {
 	i.NotNil(client)
 
 	randomData := []byte("random data")
-	txRes, err := client.SubmitPFB(context.TODO(), [28]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, randomData, 10000, 100000)
+	txRes, err := client.SubmitPFB(context.TODO(), cnc.NamespaceID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, randomData, 10000, 100000)
 	i.Require().NoError(err)
 	i.Require().NotNil(txRes)
 	i.Assert().Zero(txRes.Code)
 	expectedHeight := txRes.Height
 
-	data, err := client.NamespacedData(context.TODO(), [28]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, uint64(expectedHeight))
+	time.Sleep(5 * time.Second)
+	data, err := client.NamespacedData(context.TODO(), cnc.NamespaceID{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8}, uint64(expectedHeight))
 	i.Require().NoError(err)
 	i.Require().NotNil(data)
 	i.Len(data, 1)
