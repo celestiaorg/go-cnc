@@ -12,7 +12,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	appns "github.com/celestiaorg/celestia-app/pkg/namespace"
 	"github.com/celestiaorg/go-cnc"
 )
 
@@ -78,7 +77,7 @@ func (i *IntegrationTestSuite) TestDataRoundTrip() {
 	i.NotNil(client)
 
 	randomData := []byte("random data")
-	ns1 := appns.MustNewV0(bytes.Repeat([]byte{1}, appns.NamespaceVersionZeroIDSize))
+	ns1 := cnc.MustNewV0(bytes.Repeat([]byte{1}, cnc.NamespaceVersionZeroIDSize))
 	txRes, err := client.SubmitPFB(context.TODO(), ns1, randomData, 10000, 100000)
 	i.Require().NoError(err)
 	i.Require().NotNil(txRes)
