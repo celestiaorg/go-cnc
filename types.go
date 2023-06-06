@@ -1,6 +1,7 @@
 package cnc
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/gogo/protobuf/types"
 )
 
@@ -10,12 +11,6 @@ type SubmitPFBRequest struct {
 	Data        string `json:"data"`
 	Fee         int64  `json:"fee"`
 	GasLimit    uint64 `json:"gas_limit"`
-}
-
-// SubmitPFBRequest represents a request to submit a PayForBlob transaction.
-type SubmitPFBResponse struct {
-	Tx    *TxResponse `json:"tx,omitempty"`
-	Error string      `json:"err,omitempty"`
 }
 
 // Types below are copied from celestia-node (or cosmos-sdk dependency of celestia node, to be precise)
@@ -67,6 +62,20 @@ type ABCIMessageLog struct {
 	// Events contains a slice of Event objects that were emitted during some
 	// execution.
 	Events StringEvents `protobuf:"bytes,3,rep,name=events,proto3,castrepeated=StringEvents" json:"events"`
+}
+
+var cdc = codec.NewLegacyAmino()
+
+// String implements the fmt.Stringer interface for the ABCIMessageLogs type.
+func (logs ABCIMessageLogs) String() (str string) {
+	if logs != nil {
+		raw, err := cdc.MarshalJSON(logs)
+		if err == nil {
+			str = string(raw)
+		}
+	}
+
+	return str
 }
 
 // StringAttributes defines a slice of StringEvents objects.

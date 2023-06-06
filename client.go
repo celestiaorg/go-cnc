@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	sdkErrors "cosmossdk.io/errors"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -52,7 +53,7 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 		Fee:         fee,
 		GasLimit:    gasLimit,
 	}
-	var res SubmitPFBResponse
+	var res TxResponse
 	var rpcErr string
 	_, err := c.c.R().
 		SetContext(ctx).
@@ -68,10 +69,10 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 	}
 
 	var respErr error
-	if res.Error != "" {
-		respErr = errors.New(res.Error)
+	if res.Code != 0 {
+		respErr = errors.Join(err, sdkErrors.ABCIError(res.Codespace, res.Code, res.Logs.String()))
 	}
-	return res.Tx, respErr
+	return &res, respErr
 }
 
 func (c *Client) NamespacedShares(ctx context.Context, namespace Namespace, height uint64) ([][]byte, error) {
