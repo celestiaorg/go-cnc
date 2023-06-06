@@ -52,7 +52,7 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 		Fee:         fee,
 		GasLimit:    gasLimit,
 	}
-	var res TxResponse
+	var res SubmitPFBResponse
 	var rpcErr string
 	_, err := c.c.R().
 		SetContext(ctx).
@@ -66,7 +66,12 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 	if rpcErr != "" {
 		return nil, errors.New(rpcErr)
 	}
-	return &res, nil
+
+	var respErr error
+	if res.Error != "" {
+		respErr = errors.New(res.Error)
+	}
+	return res.Tx, respErr
 }
 
 func (c *Client) NamespacedShares(ctx context.Context, namespace Namespace, height uint64) ([][]byte, error) {

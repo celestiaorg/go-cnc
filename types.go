@@ -12,6 +12,12 @@ type SubmitPFBRequest struct {
 	GasLimit    uint64 `json:"gas_limit"`
 }
 
+// SubmitPFBRequest represents a request to submit a PayForBlob transaction.
+type SubmitPFBResponse struct {
+	Tx    *TxResponse `json:"tx,omitempty"`
+	Error string      `json:"err,omitempty"`
+}
+
 // Types below are copied from celestia-node (or cosmos-sdk dependency of celestia node, to be precise)
 // They are needed for proper deserialization.
 // It's probably far from the best approach to those types, but it's simple and works.
