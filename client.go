@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	sdkErrors "cosmossdk.io/errors"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -70,7 +69,7 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 
 	var respErr error
 	if res.Code != 0 {
-		respErr = errors.Join(err, sdkErrors.ABCIError(res.Codespace, res.Code, res.Logs.String()))
+		respErr = errors.Join(err, fmt.Errorf("codespace: %s, code: %v, err: %s", res.Codespace, res.Code, res.Logs.String()))
 	}
 	return &res, respErr
 }

@@ -1,7 +1,8 @@
 package cnc
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"encoding/json"
+
 	"github.com/gogo/protobuf/types"
 )
 
@@ -64,18 +65,15 @@ type ABCIMessageLog struct {
 	Events StringEvents `protobuf:"bytes,3,rep,name=events,proto3,castrepeated=StringEvents" json:"events"`
 }
 
-var cdc = codec.NewLegacyAmino()
-
 // String implements the fmt.Stringer interface for the ABCIMessageLogs type.
-func (logs ABCIMessageLogs) String() (str string) {
+func (logs ABCIMessageLogs) String() string {
 	if logs != nil {
-		raw, err := cdc.MarshalJSON(logs)
+		raw, err := json.Marshal(logs)
 		if err == nil {
-			str = string(raw)
+			return string(raw)
 		}
 	}
-
-	return str
+	return ""
 }
 
 // StringAttributes defines a slice of StringEvents objects.
