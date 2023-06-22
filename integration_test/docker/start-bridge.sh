@@ -13,6 +13,6 @@ echo  # newline
 export CELESTIA_CUSTOM=test:`cat genesis.hash`
 echo $CELESTIA_CUSTOM
 celestia bridge start \
-  --node.store /bridge --gateway \
+  --node.store /bridge --gateway --gateway.deprecated-endpoints \
   --core.ip 192.167.10.10 \
   --keyring.accname validator
