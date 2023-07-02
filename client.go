@@ -46,8 +46,7 @@ func (c *Client) SubmitTx(ctx context.Context, tx []byte) /* TxResponse */ error
 
 func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte, fee int64, gasLimit uint64) (*TxResponse, error) {
 	req := SubmitPFBRequest{
-		// FIXME: See https://github.com/celestiaorg/celestia-node/issues/2292
-		NamespaceID: hex.EncodeToString(namespace.Bytes()[1:]),
+		NamespaceID: hex.EncodeToString(namespace.Bytes()),
 		Data:        hex.EncodeToString(data),
 		Fee:         fee,
 		GasLimit:    gasLimit,
