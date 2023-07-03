@@ -65,7 +65,12 @@ func (c *Client) SubmitPFB(ctx context.Context, namespace Namespace, data []byte
 	if rpcErr != "" {
 		return nil, errors.New(rpcErr)
 	}
-	return &res, nil
+
+	var respErr error
+	if res.Code != 0 {
+		respErr = errors.Join(err, fmt.Errorf("codespace: %s, code: %v, err: %s", res.Codespace, res.Code, res.Logs.String()))
+	}
+	return &res, respErr
 }
 
 func (c *Client) NamespacedShares(ctx context.Context, namespace Namespace, height uint64) ([][]byte, error) {

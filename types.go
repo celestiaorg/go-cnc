@@ -1,6 +1,8 @@
 package cnc
 
 import (
+	"encoding/json"
+
 	"github.com/gogo/protobuf/types"
 )
 
@@ -61,6 +63,17 @@ type ABCIMessageLog struct {
 	// Events contains a slice of Event objects that were emitted during some
 	// execution.
 	Events StringEvents `protobuf:"bytes,3,rep,name=events,proto3,castrepeated=StringEvents" json:"events"`
+}
+
+// String implements the fmt.Stringer interface for the ABCIMessageLogs type.
+func (logs ABCIMessageLogs) String() string {
+	if logs != nil {
+		raw, err := json.Marshal(logs)
+		if err == nil {
+			return string(raw)
+		}
+	}
+	return ""
 }
 
 // StringAttributes defines a slice of StringEvents objects.
